@@ -1,12 +1,31 @@
 body {
   font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
   font-size: 30px;
-  margin: 0;
+  margin: 0.5em;
   text-align: center;
-  color: #293c4b;
 }
 
 img {
   margin: 20px 0;
   max-width: 200px;
+}
+
+.maze {
+  border: 1px solid black;
+  display: inline-block;
+  overflow: visible;
+}
+
+.maze__row {
+  display: flex;
+}
+
+.maze__grid {
+  height: 20px;
+  border: 1px solid black;
+  width: 20px;
+}
+
+.maze__grid--blocked {
+  background-color: black;
 }
