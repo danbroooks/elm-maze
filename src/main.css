@@ -11,6 +11,7 @@ img {
 }
 
 .maze {
+  background-color: black;
   border: 1px solid black;
   display: inline-block;
   overflow: visible;
@@ -21,9 +22,9 @@ img {
 }
 
 .maze__grid {
-  height: 20px;
-  border: 1px solid black;
-  width: 20px;
+  background-color: white;
+  height: 15px;
+  width: 15px;
 }
 
 .maze__grid--blocked {
