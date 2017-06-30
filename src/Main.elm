@@ -24,15 +24,16 @@ renderSlot slot = case slot of
 row : List (Slot) -> Html Msg
 row els = div [class "maze__row"] (map renderSlot els)
 
+maze : List (List Slot)
+maze = [ [ X, O, X, X, X ]
+       , [ X, O, O, O, X ]
+       , [ X, O, X, O, X ]
+       , [ X, O, X, O, X ]
+       , [ X, X, X, O, X ]
+       ]
+
 view : Model -> Html Msg
-view model =
-    div [ class "maze" ]
-        [ row [ X, O, X, X, X ]
-        , row [ X, O, O, O, X ]
-        , row [ X, O, X, O, X ]
-        , row [ X, O, X, O, X ]
-        , row [ X, X, X, O, X ]
-        ]
+view model = div [ class "maze" ] (map row maze)
 
 main : Program Never Model Msg
 main =
