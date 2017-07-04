@@ -13,7 +13,7 @@ type alias Maze = List Row
 generateMaze : Int -> Int -> Int -> Maze
 generateMaze x y seed =
   let
-    prepop = [{ x = x, y = y + 1 }]
+    prepop = [{ x = x, y = 1 }, { x = 1, y = y }, { x = x, y = y }, { x = x, y = y + 1 }]
     spaces = flatten [prepop, carve (initialSeed seed) x y { x = 1, y = 0 } []]
     emptyMaze = repeat (y + 2) <| repeat (x + 2) X
   in
@@ -62,9 +62,9 @@ validSlot x y state pt =
   let
     inner = (pt.x > 0 && pt.x <= x && pt.y > 0 && pt.y <= y)
     sec = intersection (neighbors pt) state
-    legal = member pt state /= True
+    legal = member pt state /= True && (length sec < 2)
   in
-    (length state == 0) || (length sec < 2) && (inner && legal)
+    (length state == 0) || (inner && legal)
 
 neighbors : Point -> List Point
 neighbors pt =
