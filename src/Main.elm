@@ -2,7 +2,6 @@ module Main exposing (..)
 
 import Generator exposing (Slot, occupied, generateMaze)
 import List exposing (..)
-import List.Util exposing (..)
 import Html exposing (Html, text, div, img)
 import Html.Attributes exposing (src, class)
 
@@ -19,9 +18,9 @@ update msg model = ( model, Cmd.none )
 view : Model -> Html Msg
 view model =
   div [ class "maze" ]
-  <| map (div [class "maze__row"])
-  <| map (map (\x -> div [class <| gridClass x] []))
-  <| generateMaze 20 20 model.seed
+  <| (map <| div [class "maze__row"])
+  <| (map <| map (\x -> div [class <| gridClass x] []))
+  <| generateMaze 12 12 model.seed
 
 gridClass : Slot -> String
 gridClass slot =
