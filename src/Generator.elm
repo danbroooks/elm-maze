@@ -1,10 +1,35 @@
-module Generator exposing (Point, carve)
+module Generator exposing (Slot, occupied, generateMaze)
 
 import List exposing (..)
 import List.Util exposing (..)
-import Random exposing (Seed, step)
+import Random exposing (Seed, step, initialSeed)
 
 type alias Point = { x : Int, y : Int }
+
+type Slot = X | O
+type alias Row = List Slot
+type alias Maze = List Row
+
+generateMaze : Int -> Int -> Int -> Maze
+generateMaze x y seed =
+  let
+    prepop = [{ x = x, y = y + 1 }]
+    spaces = flatten [prepop, carve (initialSeed seed) x y { x = 1, y = 0 } []]
+    emptyMaze = repeat (y + 2) <| repeat (x + 2) X
+  in
+    indexedMap (evaluateRows spaces) emptyMaze
+
+occupied : Slot -> Bool
+occupied slot = case slot of
+  X -> True
+  _ -> False
+
+evaluateRows : List Point -> Int -> Row -> Row
+evaluateRows paths y row = row |> indexedMap (evaluateCol paths y)
+
+evaluateCol : List Point -> Int -> Int -> Slot -> Slot
+evaluateCol paths y x slot =
+  if member { x = x, y = y } paths then O else slot
 
 carve : Seed -> Int -> Int -> Point -> List Point -> List Point
 carve seed x y current state =
