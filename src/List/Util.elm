@@ -8,7 +8,15 @@ shuffle n xs =
   else
     case shuffle (n - 1) xs of
       [] -> []
-      (h :: t) -> reverse (h :: (reverse t))
+      h :: t -> reverse (h :: shift n t)
+
+shift : Int -> List a -> List a
+shift n xs =
+  if n < 1 then xs
+  else
+    case shift (n - 1) xs of
+      [] -> []
+      h :: t -> reverse (h :: reverse t)
 
 memberOf : List a -> a -> Bool
 memberOf xs x = member x xs
@@ -23,4 +31,4 @@ flatten : List (List a) -> List a
 flatten xs =
   case xs of
     [] -> []
-    h :: t -> concat [ h, (reject (\x -> member x h) <| flatten t) ]
+    h :: t -> concat [ h, reject (memberOf h) (flatten t) ]
