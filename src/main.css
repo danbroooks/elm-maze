@@ -23,8 +23,8 @@ img {
 
 .maze__grid {
   background-color: white;
-  height: 15px;
-  width: 15px;
+  height: 12px;
+  width: 12px;
 }
 
 .maze__grid--blocked {

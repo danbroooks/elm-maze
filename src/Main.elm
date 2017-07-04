@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Generator exposing (Point, carve)
 import List exposing (..)
+import List.Util exposing (..)
 import Html exposing (Html, text, div, img)
 import Html.Attributes exposing (src, class)
 import Random exposing (initialSeed)
@@ -23,16 +24,14 @@ type alias Maze = List Row
 generateMaze : Int -> Int -> Int -> Maze
 generateMaze x y seed =
   let
-    spaces = carve (initialSeed seed) x y { x = 1, y = 1 } []
+    prepop = [{ x = x, y = y + 1 }]
+    spaces = flatten [prepop, carve (initialSeed seed) x y { x = 1, y = 0 } []]
     emptyMaze = repeat (y + 2) <| repeat (x + 2) X
   in
-    evaluateMaze emptyMaze <| { x = 1, y = 0 } :: { x = x, y = y + 1 } :: spaces
-
-evaluateMaze : Maze -> List Point -> Maze
-evaluateMaze maze paths = indexedMap (evaluateRows paths) maze
+    indexedMap (evaluateRows spaces) emptyMaze
 
 evaluateRows : List Point -> Int -> Row -> Row
-evaluateRows paths y row = indexedMap (evaluateCol paths y) row
+evaluateRows paths y row = row |> indexedMap (evaluateCol paths y)
 
 evaluateCol : List Point -> Int -> Int -> Slot -> Slot
 evaluateCol paths y x slot =
