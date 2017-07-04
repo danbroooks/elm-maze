@@ -17,15 +17,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = ( model, Cmd.none )
 
 view : Model -> Html Msg
-view model = div [ class "maze" ] <| map row <| generateMaze 20 20 model.seed
+view model =
+  div [ class "maze" ]
+  <| map (div [class "maze__row"])
+  <| map (map (\x -> div [class <| gridClass x] []))
+  <| generateMaze 20 20 model.seed
 
-row : List Slot -> Html Msg
-row els = div [class "maze__row"] <| map renderSlot els
-
-renderSlot : Slot -> Html Msg
-renderSlot slot = case occupied slot of
-  True -> div [class "maze__grid maze__grid--blocked"] []
-  _ -> div [class "maze__grid"] []
+gridClass : Slot -> String
+gridClass slot =
+  if occupied slot then "maze__grid maze__grid--blocked"
+  else "maze__grid"
 
 main : Program Model Model Msg
 main =
