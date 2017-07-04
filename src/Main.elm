@@ -20,7 +20,7 @@ type Slot = X | O
 type alias Row = List Slot
 type alias Maze = List Row
 
-generateMaze : Int -> Int -> Int -> List Row
+generateMaze : Int -> Int -> Int -> Maze
 generateMaze x y seed =
   let
     spaces = carve (initialSeed seed) x y { x = 1, y = 1 } []
@@ -28,7 +28,7 @@ generateMaze x y seed =
   in
     evaluateMaze emptyMaze <| { x = 1, y = 0 } :: { x = x, y = y + 1 } :: spaces
 
-evaluateMaze : List Row -> List Point -> List Row
+evaluateMaze : Maze -> List Point -> Maze
 evaluateMaze maze paths = indexedMap (evaluateRows paths) maze
 
 evaluateRows : List Point -> Int -> Row -> Row
@@ -41,7 +41,7 @@ evaluateCol paths y x slot =
 view : Model -> Html Msg
 view model = div [ class "maze" ] <| map row <| generateMaze 20 20 model.seed
 
-row : List (Slot) -> Html Msg
+row : Row -> Html Msg
 row els = div [class "maze__row"] <| map renderSlot els
 
 renderSlot : Slot -> Html Msg
