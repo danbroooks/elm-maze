@@ -4,7 +4,8 @@ import List exposing (..)
 import List.Util exposing (..)
 import Random exposing (Seed, step, initialSeed)
 
-type alias Point = { x : Int, y : Int }
+type alias Cell = { x : Int, y : Int }
+type alias Grid = List Cell
 
 type Slot = X | O
 type alias Row = List Slot
@@ -24,20 +25,20 @@ occupied slot = case slot of
   X -> True
   _ -> False
 
-evaluateRows : List Point -> Int -> Row -> Row
+evaluateRows : Grid -> Int -> Row -> Row
 evaluateRows paths y row = row |> indexedMap (evaluateCol paths y)
 
-evaluateCol : List Point -> Int -> Int -> Slot -> Slot
+evaluateCol : Grid -> Int -> Int -> Slot -> Slot
 evaluateCol paths y x slot =
   if member { x = x, y = y } paths then O else slot
 
-carve : Seed -> Int -> Int -> Point -> List Point -> List Point
+carve : Seed -> Int -> Int -> Cell -> Grid -> Grid
 carve seed x y current state =
   let
     next = flatten [[current], state]
     rec = carve rnd x y
     (shf, rnd) = step (Random.int 1 10) seed
-    isValid = validSlot x y state
+    isValid = validSlot (pointContained x y) state
   in
     if isValid current then
       current
@@ -47,23 +48,27 @@ carve seed x y current state =
     else
       state
 
-availableSlots : (Point -> Bool) -> List Point -> Point -> List Point
+availableSlots : (Cell -> Bool) -> Grid -> Cell -> Grid
 availableSlots isValid state current =
   current
   |> neighbors
   |> reject (memberOf state)
   |> filter isValid
 
-validSlot : Int -> Int -> List Point -> Point -> Bool
-validSlot x y state pt =
+pointContained : Int -> Int -> Cell -> Bool
+pointContained x y pt =
+  (pt.x > 0 && pt.x <= x && pt.y > 0 && pt.y <= y)
+
+validSlot : (Cell -> Bool) -> Grid -> Cell -> Bool
+validSlot ptCont state pt =
   let
-    inner = (pt.x > 0 && pt.x <= x && pt.y > 0 && pt.y <= y)
+    inner = ptCont pt
     sec = intersection (neighbors pt) state
     legal = member pt state /= True && (length sec < 2)
   in
     (length state == 0) || (inner && legal)
 
-neighbors : Point -> List Point
+neighbors : Cell -> List Cell
 neighbors pt =
   [ { x = pt.x - 1, y = pt.y }
   , { x = pt.x + 1, y = pt.y }
