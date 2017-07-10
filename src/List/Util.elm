@@ -27,8 +27,6 @@ reject f xs = filter (\x -> f x == False) xs
 intersection : List a -> List a -> List a
 intersection a b = filter (memberOf b) a
 
-flatten : List (List a) -> List a
-flatten xs =
-  case xs of
-    [] -> []
-    h :: t -> concat [ h, reject (memberOf h) (flatten t) ]
+union : List a -> List a -> List a
+union xs ys =
+  concat [ xs, reject (memberOf xs) ys ]

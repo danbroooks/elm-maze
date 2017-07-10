@@ -15,7 +15,7 @@ generateMaze : Int -> Int -> Int -> Maze
 generateMaze x y seed =
   let
     prepop = [{ x = x, y = 1 }, { x = 1, y = y }, { x = x, y = y }, { x = x, y = y + 1 }]
-    spaces = flatten [prepop, carve (initialSeed seed) x y { x = 1, y = 0 } []]
+    spaces = union prepop <| carve (initialSeed seed) x y { x = 1, y = 0 } []
   in
     emptyMaze x y |> indexedMap (evaluateRows spaces)
 
@@ -37,7 +37,7 @@ evaluateCol paths y x slot =
 carve : Seed -> Int -> Int -> Cell -> Grid -> Grid
 carve seed x y current state =
   let
-    next = flatten [[current], state]
+    next = current :: state
     rec = carve rnd x y
     (shf, rnd) = step (Random.int 1 10) seed
     isValid = validSlot (pointContained x y) state
