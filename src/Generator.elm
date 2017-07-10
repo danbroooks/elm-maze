@@ -41,21 +41,18 @@ carve seed x y current state =
   in
     if isValid current then
       current
-      |> availableSlots x y next
+      |> availableSlots isValid next
       |> (shuffle shf)
       |> foldr rec next
     else
       state
 
-availableSlots : Int -> Int -> List Point -> Point -> List Point
-availableSlots x y state current =
-  let
-    isValid = validSlot x y state
-  in
-    current
-    |> neighbors
-    |> reject (memberOf state)
-    |> filter isValid
+availableSlots : (Point -> Bool) -> List Point -> Point -> List Point
+availableSlots isValid state current =
+  current
+  |> neighbors
+  |> reject (memberOf state)
+  |> filter isValid
 
 validSlot : Int -> Int -> List Point -> Point -> Bool
 validSlot x y state pt =
