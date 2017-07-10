@@ -16,9 +16,11 @@ generateMaze x y seed =
   let
     prepop = [{ x = x, y = 1 }, { x = 1, y = y }, { x = x, y = y }, { x = x, y = y + 1 }]
     spaces = flatten [prepop, carve (initialSeed seed) x y { x = 1, y = 0 } []]
-    emptyMaze = repeat (y + 2) <| repeat (x + 2) X
   in
-    indexedMap (evaluateRows spaces) emptyMaze
+    emptyMaze x y |> indexedMap (evaluateRows spaces)
+
+emptyMaze : Int -> Int -> Maze
+emptyMaze x y = repeat (y + 2) <| repeat (x + 2) X
 
 occupied : Slot -> Bool
 occupied slot = case slot of
@@ -62,11 +64,10 @@ pointContained x y pt =
 validSlot : (Cell -> Bool) -> Grid -> Cell -> Bool
 validSlot ptCont state pt =
   let
-    inner = ptCont pt
     sec = intersection (neighbors pt) state
     legal = member pt state /= True && (length sec < 2)
   in
-    (length state == 0) || (inner && legal)
+    (length state == 0) || ((ptCont pt) && legal)
 
 neighbors : Cell -> List Cell
 neighbors pt =
