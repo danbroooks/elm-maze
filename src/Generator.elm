@@ -44,18 +44,13 @@ carve seed x y current state =
   in
     if isValid current then
       current
-      |> availableSlots isValid next
+      |> neighbors
+      |> reject (memberOf next)
+      |> filter isValid
       |> (shuffle shf)
       |> foldr rec next
     else
       state
-
-availableSlots : (Cell -> Bool) -> Grid -> Cell -> Grid
-availableSlots isValid state current =
-  current
-  |> neighbors
-  |> reject (memberOf state)
-  |> filter isValid
 
 pointContained : Int -> Int -> Cell -> Bool
 pointContained x y pt =
