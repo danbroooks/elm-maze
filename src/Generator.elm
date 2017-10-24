@@ -1,8 +1,8 @@
-module Generator exposing (Slot, occupied, generateMaze)
+module Generator exposing (Maze, Slot, occupied, generateMaze)
 
 import List exposing (..)
 import List.Util exposing (..)
-import Random exposing (Seed, step, initialSeed)
+import Random exposing (Seed, step)
 
 type alias Cell = { x : Int, y : Int }
 type alias Grid = List Cell
@@ -11,11 +11,11 @@ type Slot = X | O
 type alias Row = List Slot
 type alias Maze = List Row
 
-generateMaze : Int -> Int -> Int -> Maze
+generateMaze : Int -> Int -> Seed -> Maze
 generateMaze x y seed =
   let
     prepop = [{ x = x, y = 1 }, { x = 1, y = y }, { x = x, y = y }, { x = x, y = y + 1 }]
-    spaces = union prepop <| carve (initialSeed seed) x y { x = 1, y = 0 } []
+    spaces = union prepop <| carve seed x y { x = 1, y = 0 } []
   in
     emptyMaze x y |> indexedMap (evaluateRows spaces)
 

@@ -1,37 +1,53 @@
 module Main exposing (..)
 
-import Generator exposing (Slot, occupied, generateMaze)
+import Generator exposing (..)
 import List exposing (..)
-import Html exposing (Html, text, div, img)
-import Html.Attributes exposing (src, class)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Random exposing (..)
 
-type alias Model = { seed : Int }
 
-init : Model -> ( Model, Cmd Msg )
-init flags = ( flags, Cmd.none )
+type alias Model =
+    { maze : Maze }
 
-type Msg = NoOp
+
+init : ( Model, Cmd Msg )
+init =
+    ( { maze = [] }, Random.generate (initialSeed >> GenerateMaze 20 20) (Random.int 0 20000) )
+
+
+type Msg
+    = GenerateMaze Int Int Seed
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model = ( model, Cmd.none )
+update msg model =
+    case msg of
+        GenerateMaze w h seed ->
+            ( { model | maze = generateMaze w h seed }, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
-  div [ class "maze" ]
-  <| (map <| div [class "maze__row"])
-  <| (map <| map (\x -> div [class <| gridClass x] []))
-  <| generateMaze 12 12 model.seed
+    model.maze
+        |> List.map
+            (div [ class "maze__row" ] << List.map (\x -> div [ class <| gridClass x ] []))
+        |> div [ class "maze" ]
+
 
 gridClass : Slot -> String
 gridClass slot =
-  if occupied slot then "maze__grid maze__grid--blocked"
-  else "maze__grid"
+    if occupied slot then
+        "maze__grid maze__grid--blocked"
+    else
+        "maze__grid"
 
-main : Program Model Model Msg
+
+main : Program Never Model Msg
 main =
-  Html.programWithFlags
-    { view = view
-    , init = init
-    , update = update
-    , subscriptions = \_ -> Sub.none
-    }
+    Html.program
+        { view = view
+        , init = init
+        , update = update
+        , subscriptions = \_ -> Sub.none
+        }
