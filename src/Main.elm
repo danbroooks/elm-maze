@@ -4,27 +4,50 @@ import Generator exposing (..)
 import List exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Random exposing (..)
+import Task
 
 
 type alias Model =
-    { maze : Maze }
+    { maze : Maze
+    , seed : Int
+    , height : Int
+    , width : Int
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { maze = [] }, Random.generate (initialSeed >> GenerateMaze 20 20) (Random.int 0 20000) )
+    initialModel ! [ Task.succeed GenerateMaze |> Task.perform identity ]
+
+
+initialModel : Model
+initialModel =
+    { maze = []
+    , seed = 20000
+    , height = 20
+    , width = 20
+    }
 
 
 type Msg
-    = GenerateMaze Int Int Seed
+    = NoOp
+    | GenerateMaze
+    | SetSeed Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GenerateMaze w h seed ->
-            ( { model | maze = generateMaze w h seed }, Cmd.none )
+        GenerateMaze ->
+            ( { model | maze = generateMaze model.width model.height (initialSeed model.seed) }, Cmd.none )
+
+        SetSeed seed ->
+            { model | seed = seed } ! []
+
+        _ ->
+            model ! []
 
 
 renderSlot : Slot -> Html msg
@@ -38,11 +61,33 @@ renderRow row =
         |> div [ class "maze__row" ]
 
 
-view : Model -> Html msg
+seedInput : Int -> Html Msg
+seedInput seed =
+    input [ type_ "number", value (toString seed), onInput setSeed ] []
+
+
+setSeed : String -> Msg
+setSeed val =
+    String.toInt val
+        |> Result.map SetSeed
+        |> Result.withDefault NoOp
+
+
+view : Model -> Html Msg
 view model =
-    model.maze
-        |> List.map renderRow
-        |> div [ class "maze" ]
+    let
+        maze =
+            model.maze
+                |> List.map renderRow
+                |> div [ class "maze" ]
+    in
+        div []
+            [ maze
+            , div []
+                [ seedInput model.seed
+                , button [ onClick GenerateMaze ] [ text "generate" ]
+                ]
+            ]
 
 
 gridClass : Slot -> String
