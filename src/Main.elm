@@ -27,11 +27,21 @@ update msg model =
             ( { model | maze = generateMaze w h seed }, Cmd.none )
 
 
-view : Model -> Html Msg
+renderSlot : Slot -> Html msg
+renderSlot slot =
+    div [ class (gridClass slot) ] []
+
+
+renderRow : List Slot -> Html msg
+renderRow row =
+    List.map renderSlot row
+        |> div [ class "maze__row" ]
+
+
+view : Model -> Html msg
 view model =
     model.maze
-        |> List.map
-            (div [ class "maze__row" ] << List.map (\x -> div [ class <| gridClass x ] []))
+        |> List.map renderRow
         |> div [ class "maze" ]
 
 
