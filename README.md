@@ -7,5 +7,5 @@ Generate mazes using Elm.
 Run using `elm-app`:
 
 ```
-λ elm-app start
+λ yarn start
 ```
