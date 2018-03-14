@@ -52,13 +52,12 @@ update msg model =
 
 renderSlot : Slot -> Html msg
 renderSlot slot =
-    div [ class (gridClass slot) ] []
+    div [ class <| gridClass slot ] []
 
 
 renderRow : List Slot -> Html msg
-renderRow row =
-    List.map renderSlot row
-        |> div [ class "maze__row" ]
+renderRow =
+    List.map renderSlot >> div [ class "maze__row" ]
 
 
 seedInput : Int -> Html Msg

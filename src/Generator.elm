@@ -6,7 +6,9 @@ import Random exposing (Seed, step)
 
 
 type alias Cell =
-    { x : Int, y : Int }
+    { x : Int
+    , y : Int
+    }
 
 
 type alias Grid =
@@ -58,8 +60,8 @@ occupied slot =
 
 
 evaluateRows : Grid -> Int -> Row -> Row
-evaluateRows paths y =
-    indexedMap (evaluateCol paths y)
+evaluateRows paths =
+    indexedMap << evaluateCol paths
 
 
 evaluateCol : Grid -> Int -> Int -> Slot -> Slot
@@ -110,7 +112,7 @@ validSlot ptCont state pt =
         legal =
             member pt state /= True && (length sec < 2)
     in
-        (length state == 0) || ((ptCont pt) && legal)
+        length state == 0 || (ptCont pt && legal)
 
 
 neighbors : Cell -> List Cell
