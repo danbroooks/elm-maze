@@ -17,15 +17,20 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    initialModel ! [ Task.succeed GenerateMaze |> Task.perform identity ]
+type alias Flags =
+    { seed : Int
+    }
 
 
-initialModel : Model
-initialModel =
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    initialModel flags ! [ Task.succeed GenerateMaze |> Task.perform identity ]
+
+
+initialModel : Flags -> Model
+initialModel { seed } =
     { maze = []
-    , seed = 20000
+    , seed = seed
     , height = 20
     , width = 20
     }
@@ -97,9 +102,9 @@ gridClass slot =
         "maze__grid"
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { view = view
         , init = init
         , update = update

@@ -1,8 +1,8 @@
-module Generator exposing (Maze, Slot, occupied, generateMaze)
+module Generator exposing (Maze, Slot, occupied, generateMaze, comonad)
 
 import List exposing (..)
 import List.Util exposing (..)
-import Random exposing (Seed, step)
+import Random exposing (Seed, step, initialSeed)
 
 
 type alias Cell =
@@ -26,6 +26,32 @@ type alias Row =
 
 type alias Maze =
     List Row
+
+
+type CoList a
+    = CoList a (List a)
+
+
+extend : (CoList a -> a) -> CoList a -> CoList a
+extend f ((CoList x xs) as c) =
+    CoList (f c) (xs)
+
+
+extract : CoList a -> a
+extract (CoList x _) =
+    x
+
+
+transform : CoList number -> number
+transform (CoList x xs) =
+    x + 1
+
+
+comonad : CoList number
+comonad =
+    (CoList 1 [])
+        |> extend transform
+        |> extend transform
 
 
 generateMaze : Int -> Int -> Seed -> Maze
@@ -60,8 +86,8 @@ occupied slot =
 
 
 evaluateRows : Grid -> Int -> Row -> Row
-evaluateRows paths =
-    indexedMap << evaluateCol paths
+evaluateRows paths y row =
+    row |> indexedMap (evaluateCol paths y)
 
 
 evaluateCol : Grid -> Int -> Int -> Slot -> Slot
@@ -75,25 +101,31 @@ evaluateCol paths y x slot =
 carve : Seed -> Int -> Int -> Cell -> Grid -> Grid
 carve seed x y current state =
     let
-        next =
-            current :: state
-
-        rec =
-            carve rnd x y
-
         ( shf, rnd ) =
             step (Random.int 1 10) seed
 
         isValid =
             validSlot (pointContained x y) state
     in
+        carve_ isValid rnd shf x y current state
+
+
+carve_ : (Cell -> Bool) -> Seed -> Int -> Int -> Int -> Cell -> Grid -> Grid
+carve_ isValid rnd shf x y current state =
+    let
+        next =
+            current :: state
+
+        rec =
+            carve rnd x y
+    in
         if isValid current then
             current
                 |> neighbors
                 |> reject (memberOf next)
                 |> filter isValid
-                |> (shuffle shf)
-                |> foldr rec next
+                |> shuffle shf
+                |> foldr (carve rnd x y) next
         else
             state
 
