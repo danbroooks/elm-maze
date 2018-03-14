@@ -73,29 +73,43 @@ evaluateCol paths y x slot =
 
 
 carve : Seed -> Int -> Int -> Cell -> Grid -> Grid
-carve seed x y current state =
+carve seed x y focus state =
     let
         next =
-            current :: state
-
-        rec =
-            carve rnd x y
-
-        ( shf, rnd ) =
-            step (Random.int 1 10) seed
-
-        isValid =
-            validSlot (pointContained x y) state
+            focus :: state
     in
-        if isValid current then
-            current
-                |> neighbors
-                |> reject (memberOf next)
-                |> filter isValid
-                |> (shuffle shf)
-                |> foldr rec next
-        else
-            state
+        neighbors focus
+            |> reject (memberOf next)
+            |> filter (validSlot (pointContained x y) state)
+
+
+
+-- take current focus
+-- find all valid neighbors
+-- add to state, as list of potential next moves
+-- randomly pick one of these cells
+-- recur as next focus
+{-
+   let
+       next =
+           current :: state
+
+       ( shf, rnd ) =
+           step (Random.int 1 10) seed
+
+       isValid =
+           validSlot (pointContained x y) state
+   in
+       if isValid current then
+           current
+               |> neighbors
+               |> reject (memberOf next)
+               |> filter isValid
+               |> shuffle shf
+               |> foldr (carve rnd x y) next
+       else
+           state
+-}
 
 
 pointContained : Int -> Int -> Cell -> Bool
